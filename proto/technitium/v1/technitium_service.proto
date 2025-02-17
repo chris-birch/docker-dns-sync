@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package technitium.v1;
+
+option go_package = "github.com/chris-birch/docker-dns-sync/proto/technitium/service";
+
+import public "google/protobuf/empty.proto";
+import "record.proto";
+
+service TechnitiumService {
+  rpc ProcessRecord (stream DnsRecord) returns (google.protobuf.Empty);
+}
