@@ -22,7 +22,7 @@ func main() {
 	reflection.Register(s)
 
 	// Assign the GRPc services
-	technitiumService := technitium.TechnitiumService{}
+	technitiumService := technitium.Service{}
 
 	// Register the services
 	service.RegisterTechnitiumServiceServer(s, &technitiumService)

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package technitium.v1;
-option go_package = "github.com/chris-birch/docker-dns-sync/proto/technitium/message";
+option go_package = "github.com/chris-birch/docker-dns-sync/proto/technitium/v1/message";
 
 // A DNS record created from a Docker event
 message DnsRecord {
@@ -9,6 +9,7 @@ message DnsRecord {
   Type type = 2;
   string data =3;
   Action action = 4;
+  string containerId = 5;
 }
 
 enum Type {

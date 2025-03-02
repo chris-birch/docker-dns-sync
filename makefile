@@ -42,9 +42,9 @@ build:
 proto-build-technitium: # https://dev.to/davidsbond/golang-structuring-repositories-with-protocol-buffers-3012
 	protoc \
 	--proto_path=${PWD}/proto/technitium/${PROTO_VERSION} \
-	--go_out=${PWD}/proto/technitium/${PROTO_VERSION} \
+	--go_out=${PWD}/proto/technitium \
 	--go_opt=module=github.com/chris-birch/docker-dns-sync/proto/technitium \
 	--go-grpc_opt=module=github.com/chris-birch/docker-dns-sync/proto/technitium \
-	--go-grpc_out=${PWD}/proto/technitium/${PROTO_VERSION} \
+	--go-grpc_out=${PWD}/proto/technitium \
 	--proto_path=/usr/local/include \
 	${PWD}/proto/technitium/${PROTO_VERSION}/*.proto
