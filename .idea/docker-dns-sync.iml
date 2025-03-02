@@ -5,5 +5,9 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="docker-event-actions" />
+    <orderEntry type="module" module-name="go-classicmodels" />
+    <orderEntry type="module" module-name="go-routine-counter" />
+    <orderEntry type="module" module-name="server-shutdown" />
   </component>
 </module>

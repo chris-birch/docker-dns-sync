@@ -3,6 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/docker-dns-sync.iml" filepath="$PROJECT_DIR$/.idea/docker-dns-sync.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../docker-event-actions/.idea/docker-event-actions.iml" filepath="$PROJECT_DIR$/../docker-event-actions/.idea/docker-event-actions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../go-classicmodels/.idea/go-classicmodels.iml" filepath="$PROJECT_DIR$/../go-classicmodels/.idea/go-classicmodels.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tmp/go-routine-counter/.idea/go-routine-counter.iml" filepath="$PROJECT_DIR$/../tmp/go-routine-counter/.idea/go-routine-counter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../server-shutdown/.idea/server-shutdown.iml" filepath="$PROJECT_DIR$/../server-shutdown/.idea/server-shutdown.iml" />
     </modules>
   </component>
 </project>

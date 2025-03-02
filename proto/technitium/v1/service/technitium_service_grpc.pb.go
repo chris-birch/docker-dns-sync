@@ -8,7 +8,7 @@ package service
 
 import (
 	context "context"
-	message "github.com/chris-birch/docker-dns-sync/proto/technitium/v1/message"
+	message "github.com/chris-birch/docker-dns-sync/proto/technitium/message"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

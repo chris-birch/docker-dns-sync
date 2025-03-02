@@ -7,7 +7,7 @@
 package service
 
 import (
-	message "github.com/chris-birch/docker-dns-sync/proto/technitium/v1/message"
+	message "github.com/chris-birch/docker-dns-sync/proto/technitium/message"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"

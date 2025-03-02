@@ -8,9 +8,18 @@ message DnsRecord {
   string name = 1;
   Type type = 2;
   string data =3;
+  Action action = 4;
 }
 
 enum Type {
   TYPE_CNAME = 0;
   TYPE_A = 1;
-}
+};
+
+enum Action {
+  ACTION_CREATE = 0;
+  ACTION_ATTACH = 1;
+  ACTION_START = 2;
+  ACTION_DIE = 3;
+  ACTION_DESTROY = 4;
+};
