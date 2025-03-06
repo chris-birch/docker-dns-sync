@@ -1,86 +1,152 @@
 package technitium
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"github.com/caarlos0/env/v11"
+	"github.com/chris-birch/docker-dns-sync/proto/technitium/v1/message"
 	"net/http"
 	"time"
 
 	"github.com/chris-birch/docker-dns-sync/proto/technitium/v1/service"
 
 	"io"
-	"log"
+
+	"github.com/rs/zerolog/log"
+)
+
+const (
+	ADD = "add"
+	DEL = "delete"
 )
 
 type Service struct {
 	service.UnimplementedTechnitiumServiceServer
+	Cfg *Config
 }
 
-func (*Service) ProcessRecord(stream service.TechnitiumService_ProcessRecordServer) error {
+type Config struct {
+	Token  string `env:"TOKEN,required"`
+	Port   string `env:"PORT,required"`
+	Server string `env:"SERVER,required"`
+	Zone   string `env:"ZONE,required"`
+	Client *http.Client
+}
+
+type RespStatus struct {
+	Status       string `json:"status"`
+	ErrorMessage string `json:"errorMessage"`
+}
+
+func (c *Config) Init() {
+	if err := env.Parse(c); err != nil {
+		log.Fatal().Err(err).Msg("Failed to parse config")
+	}
+	c.Client = &http.Client{Timeout: 3 * time.Second}
+}
+
+func (s *Service) ProcessRecord(stream service.TechnitiumService_ProcessRecordServer) error {
 	for {
 		rec, err := stream.Recv()
 		if err == io.EOF {
-			fmt.Println("end of stream")
+			log.Debug().Msg("Connection closed")
 		}
 		if err != nil {
 			return err
 		}
 		switch rec.Action {
-		case 0: // CREATE
-			fmt.Printf("Action %s, ID: %s\n", rec.Action, rec.ContainerId)
-			apiRequest()
+		case 2: // START
+			err = apiRequest(rec, s.Cfg, ADD)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to process record")
+			} else {
+				log.Info().
+					Str("Zone", s.Cfg.Zone).
+					Str("DomainName", rec.Name+"."+s.Cfg.Zone).
+					Str("Data", rec.Data).
+					Msg("Added record")
+			}
 		case 3: // DIE
-			fmt.Printf("Action %s, ID: %s\n", rec.Action, rec.ContainerId)
+			err = apiRequest(rec, s.Cfg, DEL)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to process record")
+			} else {
+				log.Info().
+					Str("Zone", s.Cfg.Zone).
+					Str("DomainName", rec.Name+"."+s.Cfg.Zone).
+					Str("Data", rec.Data).
+					Msg("Deleted record")
+			}
 		default:
-			fmt.Printf("DISCARDING - Action %s, ID: %s\n", rec.Action, rec.ContainerId)
+			log.Info().
+				Str("Action", rec.Action.String()).
+				Str("Hostname", rec.Name).
+				Msg("Discarding record")
 		}
 	}
 }
 
-func httpClient() *http.Client {
-	// Reuse the http.Client throughout your code base.
-	client := &http.Client{Timeout: 3 * time.Second}
-	return client
-}
-
-func apiRequest() {
-	PORT := "5380"
-	SERVER := "192.168.2.4"
-	BASE := "http://" + SERVER + ":" + PORT + "/api/zones/records"
+func apiRequest(rec *message.DnsRecord, cfg *Config, method string) error {
+	BASE := "http://" + cfg.Server + ":" + cfg.Port + "/api/zones/records"
 
 	// Create a new HTTP GET request
-	req, err := http.NewRequest("GET", BASE+"/add", nil)
+	req, err := http.NewRequest("GET", BASE+"/"+method, nil)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	// You can set custom headers here, if necessary
+	// Set custom headers
 	req.Header.Set("User-Agent", "Go-HTTP-Client")
-	ZONE := "dummy.net" //TODO get this as an envar
+
+	// Set query params
 	q := req.URL.Query()
-	q.Add("token", "0663aea32e1520aeefd175f8f9b9656394ac8012568259fd1dce0b0ebbe4bf18")
-	q.Add("zone", ZONE)
-	q.Add("domain", "CONTAINER_HOSTNAME"+"."+ZONE) // Container hostname
+	q.Add("token", cfg.Token)
+	q.Add("zone", cfg.Zone)
+	q.Add("domain", rec.Name+"."+cfg.Zone) // Container hostname
 	q.Add("type", "CNAME")
-	q.Add("cname", "yyyy.dummy.net")      // Docker host
-	q.Add("comment", "This is a comment") //TODO Make this a JSON obj containing useful data
+	q.Add("cname", rec.Data) // Docker host
+	q.Add("comment", rec.ContainerId)
 	req.URL.RawQuery = q.Encode()
 
+	// Log the request
+	log.Debug().Str("Query", req.URL.String()).Msg("Technitium API")
+
 	// Perform the request
-	client := &http.Client{}
+	client := cfg.Client
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
+	// Check request status
+	if resp.StatusCode != 200 {
+		err := fmt.Errorf("technitium api response status code %d", resp.StatusCode)
+		return err
 	}
 
-	// Print the response status and body
-	fmt.Println("Response Status:", resp.Status)
-	fmt.Println("Response Body:", string(body))
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return errors.New("failed to read response body")
+	}
+
+	// Check JSON response
+	var s RespStatus
+	err = json.Unmarshal(body, &s)
+	if err != nil {
+		return errors.New("failed to unmarshal response body")
+	}
+
+	// Log the API response
+	log.Debug().RawJSON("response", body).Msg("Technitium API")
+
+	// Check for any errors
+	if s.ErrorMessage != "" {
+		err := fmt.Errorf("technitium API error: %s", s.ErrorMessage)
+		return err
+	}
+
+	return nil
 }
