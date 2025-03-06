@@ -106,7 +106,7 @@ func apiRequest(rec *message.DnsRecord, cfg *Config, method string) error {
 	q.Add("domain", rec.Name+"."+cfg.Zone) // Container hostname
 	q.Add("type", "CNAME")
 	q.Add("cname", rec.Data) // Docker host
-	q.Add("comment", rec.ContainerId)
+	q.Add("comments", rec.ContainerId)
 	req.URL.RawQuery = q.Encode()
 
 	// Log the request
