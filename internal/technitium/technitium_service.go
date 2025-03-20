@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/caarlos0/env/v11"
-	"github.com/chris-birch/docker-dns-sync/proto/technitium/v1/message"
+	"github.com/chris-birch/docker-dns-sync/pkg/technitium/v1/message"
 	"net/http"
 	"time"
 
-	"github.com/chris-birch/docker-dns-sync/proto/technitium/v1/service"
+	"github.com/chris-birch/docker-dns-sync/pkg/technitium/v1/service"
 
 	"io"
 

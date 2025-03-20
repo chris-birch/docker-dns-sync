@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package technitium.v1;
 
-option go_package = "github.com/chris-birch/docker-dns-sync/proto/technitium/v1/service";
+option go_package = "github.com/chris-birch/docker-dns-sync/pkg/technitium/v1/service";
 
 import public "google/protobuf/empty.proto";
 import "record.proto";

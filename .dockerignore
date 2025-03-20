@@ -1,2 +1,19 @@
-/src/docker-event-monitor
-.vscode
+# Ignore everything
+*
+
+# Allow files and directories
+!/go.mod
+!/go.sum
+!/src
+!/pkg
+!/internal
+!/.dockerignore
+!/makefile
+
+# Ignore unnecessary files inside allowed directories
+# This should go after the allowed directories
+**/*~
+**/*.log
+**/.DS_Store
+**/Thumbs.db
+**/bin

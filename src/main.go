@@ -1,9 +1,8 @@
 package main
 
 import (
-	"github.com/chris-birch/docker-dns-sync/proto/technitium/v1/service"
-	"github.com/chris-birch/docker-dns-sync/src/technitium"
-
+	"github.com/chris-birch/docker-dns-sync/internal/technitium"
+	"github.com/chris-birch/docker-dns-sync/pkg/technitium/v1/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
@@ -29,7 +28,7 @@ func init() {
 
 func main() {
 	// create a TCP listener on the specified port
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", ":50051") //TODO Get from envars
 	if err != nil {
 		log.Fatal().Msgf("tcp connection failed: %v", err)
 	}

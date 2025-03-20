@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package technitium.v1;
-option go_package = "github.com/chris-birch/docker-dns-sync/proto/technitium/v1/message";
+option go_package = "github.com/chris-birch/docker-dns-sync/pkg/technitium/v1/message";
 
 // A DNS record created from a Docker event
 message DnsRecord {
